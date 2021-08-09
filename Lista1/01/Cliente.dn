@@ -1,0 +1,33 @@
+component provides App requires io.Output out,io.Input in, net.TCPSocket, data.DecUtil du,data.StringUtil su{
+
+	int App:main(AppParam params[])
+		{
+		TCPSocket client = new TCPSocket()
+
+		if (client.connect("127.0.0.1", 2020))
+			{
+      out.print("Nome : ")
+      char nome[] = in.readln()
+      out.print("Cargo : ")
+      char cargo[] = in.readln()
+      out.print("Salario : ")
+      char salario[] = in.readln()
+
+      dec salario2 = du.decFromString(salario)
+
+      if ( su.iequal(cargo,"programador") == 1 ){
+          salario2 = salario2*(1.18)
+      }
+      if ( su.iequal(cargo,"operador") == 1 ){
+          salario2 = salario2*(1.2)
+      }
+      char salario3[] = du.makeString(salario2)
+
+      char result[] = "$nome $salario3"
+      client.send(new char[](result, "\n"))
+			client.disconnect()
+			}
+
+		return 0
+		}
+	}
