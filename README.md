@@ -1,2 +1,2 @@
-# RenatoDias
+# Isabela - Renato
 Sistemas Distribuidos Listas
