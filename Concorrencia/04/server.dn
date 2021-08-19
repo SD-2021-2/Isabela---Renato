@@ -1,0 +1,41 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du {
+    void streamHandler(TCPSocket s)
+          		{
+                out.println("Cliente Aceito")
+          		  char lista[] = s.recv(64)
+                JSONElement document = parser.parseDocument(lista)
+                char altura[] = parser.getValue(document, "altura").value
+                char sexo[] = parser.getValue(document, "sexo").value
+
+                dec a = du.decFromString(altura)
+                dec peso
+
+                if ( su.iequal(sexo,"masculino") == 1 ){
+                    peso = (72.7 * a) - 58
+                }else if (su.iequal(sexo,"feminino") == 1 ){
+                    peso = (62.1 * a) - 44.7
+                }
+                //s.send("Peso ideal : $peso KG")
+                out.println("Peso ideal : $peso KG")
+                s.disconnect()
+              }
+    int App:main(AppParam params[])
+          		{
+          		TCPServerSocket host = new TCPServerSocket()
+           		host.bind(TCPServerSocket.ANY_ADDRESS, 2020)
+
+          		out.println("Waiting for clients...")
+
+              while (true)
+                    {
+                    TCPSocket client = new TCPSocket()
+
+                    if (client.accept(host))
+                    		asynch::streamHandler(client)
+                    }
+
+              return 0
+              }
+    	}

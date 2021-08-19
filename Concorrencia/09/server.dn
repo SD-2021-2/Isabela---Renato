@@ -1,0 +1,58 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du {
+
+    void streamHandler(TCPSocket s)
+          		{
+                out.println("Cliente Aceito")
+          		  char lista[] = s.recv(64)
+                JSONElement document = parser.parseDocument(lista)
+                char numero[] = parser.getValue(document, "numero").value
+                char naipe[] = parser.getValue(document, "naipe").value
+
+                dec num = du.decFromString(numero)
+                dec nai = du.decFromString(naipe)
+
+                char result[] = null
+
+                if (num == 1) { result = "AS"}
+                if (num == 2) { result = "DOIS"}
+                if (num == 3) { result = "TRES"}
+                if (num == 4) { result = "QUATRO"}
+                if (num == 5) { result = "CINCO"}
+                if (num == 6) { result = "SEIS"}
+                if (num == 7) { result = "SETE"}
+                if (num == 8) { result = "OITO"}
+                if (num == 9) { result = "NOVE"}
+                if (num == 10) { result = "DEZ"}
+                if (num == 11) { result = "VALETE"}
+                if (num == 12) { result = "DAMA"}
+                if (num == 13) { result = "REI"}
+
+                if (nai == 1) { result = "$result De Ouro"}
+                if (nai == 2) { result = "$result De Paus"}
+                if (nai == 3) { result = "$result De Copas"}
+                if (nai == 4) { result = "$result De Espada"}
+
+                //s.send("$result")
+                out.println("$result")
+                s.disconnect()
+              }
+    int App:main(AppParam params[])
+          		{
+          		TCPServerSocket host = new TCPServerSocket()
+           		host.bind(TCPServerSocket.ANY_ADDRESS, 2020)
+
+          		out.println("Waiting for clients...")
+
+              while (true)
+                    {
+                    TCPSocket client = new TCPSocket()
+
+                    if (client.accept(host))
+                    		asynch::streamHandler(client)
+                    }
+
+              return 0
+              }
+    	}

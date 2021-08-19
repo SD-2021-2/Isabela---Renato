@@ -1,0 +1,55 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du {
+    void streamHandler(TCPSocket s)
+          		{
+                out.println("Cliente Aceito")
+          		  char lista[] = s.recv(64)
+                JSONElement document = parser.parseDocument(lista)
+                char nota1[] = parser.getValue(document, "n1").value
+                char nota2[] = parser.getValue(document, "n2").value
+                char nota3[] = parser.getValue(document, "n3").value
+
+                dec n1 = du.decFromString(nota1)
+                dec n2 = du.decFromString(nota2)
+                dec n3 = du.decFromString(nota3)
+
+                bool flag = false
+
+                if ( ((n1 + n2) / 2) >= 7 ){
+                    flag = true
+                }else if (( ((n1 + n2) / 2) > 3) && ((n1 + n2) / 2) < 7 ){
+                    if (((n1+n2+n3)/3) > 5){
+                    flag = true
+                    }
+                }
+                char result[] = null
+                if ( flag == true ){
+                  result = "Aprovado"
+                  //s.send("Aprovado\r\n\r\n")
+                }else{
+                  result = "Reprovado"
+                  //s.send("Reprovado\r\n\r\n")
+                }
+                //s.send(result)
+                out.println("$result")
+                s.disconnect()
+              }
+    int App:main(AppParam params[])
+          		{
+          		TCPServerSocket host = new TCPServerSocket()
+           		host.bind(TCPServerSocket.ANY_ADDRESS, 2020)
+
+          		out.println("Waiting for clients...")
+
+              while (true)
+                    {
+                    TCPSocket client = new TCPSocket()
+
+                    if (client.accept(host))
+                    		asynch::streamHandler(client)
+                    }
+
+              return 0
+              }
+    	}
