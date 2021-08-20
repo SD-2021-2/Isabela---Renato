@@ -1,11 +1,18 @@
 component provides App requires io.Output out, net.TCPServerSocket,
                                 net.TCPSocket, data.json.JSONParser parser,
                                 data.StringUtil su,data.DecUtil du {
-    void streamHandler(TCPSocket s)
-          		{
-                out.println("Cliente Aceito")
-          		  char lista[] = s.recv(64)
-                JSONElement document = parser.parseDocument(lista)
+    void streamHandler(TCPSocket s){
+                out.println("Client Accepted")
+                char buf[] = null
+                char myData[] = null
+                while ((buf = s.recv(1)).arrayLength > 0) {
+                  myData = new char[](myData, buf)
+                  if (buf == "\n") {
+                      break
+                  }
+                }
+
+                JSONElement document = parser.parseDocument(myData)
                 char saldo[] = parser.getValue(document, "saldo").value
 
                 dec sal = du.decFromString(saldo)
@@ -22,8 +29,7 @@ component provides App requires io.Output out, net.TCPServerSocket,
                 if ( sal >= 601){
                    result = sal*0.4
                 }
-                //s.send("Saldo : $sal , Credito : $result")
-                out.println("Saldo : $sal , Credito : $result")
+                s.send("Saldo : $sal , Credito : $result")
                 s.disconnect()
               }
     int App:main(AppParam params[])

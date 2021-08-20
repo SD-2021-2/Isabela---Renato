@@ -21,5 +21,5 @@ json1 = {
 document = json.dumps(json1)
 s.sendall((document+"\n").encode())
 print("mensagem enviada")
-#resposta = s.recv(1024)
-#print(resposta)
+resposta = s.recv(1024)
+print(resposta)

@@ -3,9 +3,16 @@ component provides App requires io.Output out, net.TCPServerSocket,
                                 data.StringUtil su,data.DecUtil du {
     void streamHandler(TCPSocket s)
           		{
-                out.println("Cliente Aceito")
-          		  char lista[] = s.recv(64)
-                JSONElement document = parser.parseDocument(lista)
+                out.println("Client Accepted")
+                char buf[] = null
+                char myData[] = null
+                while ((buf = s.recv(1)).arrayLength > 0) {
+                  myData = new char[](myData, buf)
+                  if (buf == "\n") {
+                      break
+                  }
+                }
+                JSONElement document = parser.parseDocument(myData)
                 char nome[] = parser.getValue(document, "nome").value
                 char nivel[] = parser.getValue(document, "nivel").value
                 char salario[] = parser.getValue(document, "salario").value
@@ -31,8 +38,7 @@ component provides App requires io.Output out, net.TCPServerSocket,
                   if ( num == 0 ) { result = sal*0.90 }
                   if ( num > 0  ) { result = sal*0.83 }
                 }
-                //s.send("Salario Liquido : $result , $nome , $nivel")
-                out.println("Salario Liquido : $result , $nome , $nivel")
+                s.send("Salario Liquido : $result , $nome , $nivel")
                 s.disconnect()
               }
     int App:main(AppParam params[])

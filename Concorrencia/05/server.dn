@@ -3,9 +3,16 @@ component provides App requires io.Output out, net.TCPServerSocket,
                                 data.StringUtil su,data.DecUtil du {
     void streamHandler(TCPSocket s)
           		{
-                out.println("Cliente Aceito")
-          		  char lista[] = s.recv(64)
-                JSONElement document = parser.parseDocument(lista)
+                out.println("Client Accepted")
+                char buf[] = null
+                char myData[] = null
+                while ((buf = s.recv(1)).arrayLength > 0) {
+                  myData = new char[](myData, buf)
+                  if (buf == "\n") {
+                      break
+                  }
+                }
+                JSONElement document = parser.parseDocument(myData)
                 char idade[] = parser.getValue(document, "idade").value
 
                 dec i = du.decFromString(idade)
@@ -26,8 +33,7 @@ component provides App requires io.Output out, net.TCPServerSocket,
                 if ( i >= 18){
                     result = "adulto"
                 }
-                //s.send(result)
-                out.println("$result")
+                s.send(result)
                 s.disconnect()
               }
     int App:main(AppParam params[])
