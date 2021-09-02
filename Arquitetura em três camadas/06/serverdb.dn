@@ -1,0 +1,63 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du, data.adt.List li {
+
+    void streamHandler(TCPSocket s){
+
+        out.println("Client Accepted")
+        char buf[] = null
+        char myData[] = null
+
+        while ((buf = s.recv(1)).arrayLength > 0) {
+            myData = new char[](myData, buf)
+            if (buf == "\n") {break}
+        }
+
+        JSONElement document = parser.parseDocument(myData)
+        char nome[] = parser.getValue(document, "nome").value
+        char nivel[] = parser.getValue(document, "nivel").value
+        char salario[] = parser.getValue(document, "salario").value
+        char numero[] = parser.getValue(document, "numero").value
+
+        dec sal = du.decFromString(salario)
+        dec num = du.decFromString(numero)
+        dec result = 0
+
+        if ( nivel[0] == "A"){
+          if ( num == 0 ) { result = sal*0.97 }
+          if ( num > 0  ) { result = sal*0.92 }
+        }
+        if ( nivel[0] == "B"){
+          if ( num == 0 ) { result = sal*0.95 }
+          if ( num > 0  ) { result = sal*0.90 }
+        }
+        if ( nivel[0] == "C"){
+          if ( num == 0 ) { result = sal*0.92 }
+          if ( num > 0  ) { result = sal*0.85 }
+        }
+        if ( nivel[0] == "D"){
+          if ( num == 0 ) { result = sal*0.90 }
+          if ( num > 0  ) { result = sal*0.83 }
+        }
+        s.send("Salario Liquido : $result , Nome : $nome , Nivel : $nivel")
+        s.disconnect()
+      }
+
+int App:main(AppParam params[])
+          {
+          TCPServerSocket host = new TCPServerSocket()
+          host.bind(TCPServerSocket.ANY_ADDRESS, 2021)
+
+          out.println("Waiting for clients...")
+
+          while (true)
+                {
+                TCPSocket client = new TCPSocket()
+
+                if (client.accept(host))
+                    asynch::streamHandler(client)
+                }
+
+          return 0
+          }
+  }

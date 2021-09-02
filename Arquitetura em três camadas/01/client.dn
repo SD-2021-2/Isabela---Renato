@@ -1,0 +1,19 @@
+/*
+component provides App requires io.Output out, net.TCPSocket, net.http.HTTPRequest, time.Timer t{
+
+	int App:main(AppParam params[]){
+
+    TCPSocket client = new TCPSocket()
+		HTTPResponse test = new HTTPResponse()
+
+		if (client.connect("127.0.0.1", 2011)){
+      while(true){
+				//t.sleep(3000)
+        test = get("http://localhost:2012/index.html")
+        test = get("http://localhost:2012/lancaster.jpg")
+      }
+    }
+    client.disconnect()
+		return 0
+		}
+	}

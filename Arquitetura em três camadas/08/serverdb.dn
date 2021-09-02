@@ -1,0 +1,54 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du, data.adt.List li {
+
+    void streamHandler(TCPSocket s){
+
+        out.println("Client Accepted")
+        char buf[] = null
+        char myData[] = null
+
+        while ((buf = s.recv(1)).arrayLength > 0) {
+            myData = new char[](myData, buf)
+            if (buf == "\n") {break}
+        }
+
+        JSONElement document = parser.parseDocument(myData)
+        char saldo[] = parser.getValue(document, "saldo").value
+
+        dec sal = du.decFromString(saldo)
+        dec result = 0
+        if ( sal >= 0 && sal <= 200){
+           result = 0
+        }
+        if ( sal >= 201 && sal <= 400){
+           result = sal*0.2
+        }
+        if ( sal >= 401 && sal <= 600){
+           result = sal*0.3
+        }
+        if ( sal >= 601){
+           result = sal*0.4
+        }
+        s.send("Saldo : $sal , Credito : $result")
+        s.disconnect()
+      }
+
+int App:main(AppParam params[])
+          {
+          TCPServerSocket host = new TCPServerSocket()
+          host.bind(TCPServerSocket.ANY_ADDRESS, 2021)
+
+          out.println("Waiting for clients...")
+
+          while (true)
+                {
+                TCPSocket client = new TCPSocket()
+
+                if (client.accept(host))
+                    asynch::streamHandler(client)
+                }
+
+          return 0
+          }
+  }

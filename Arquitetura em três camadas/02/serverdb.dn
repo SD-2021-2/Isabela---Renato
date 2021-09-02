@@ -1,0 +1,59 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du, data.adt.List li {
+
+    void streamHandler(TCPSocket s){
+
+        out.println("Client Accepted")
+        char buf[] = null
+        char myData[] = null
+        char result[] = null
+        while ((buf = s.recv(1)).arrayLength > 0) {
+            myData = new char[](myData, buf)
+            if (buf == "\n") {break}
+        }
+
+        JSONElement document = parser.parseDocument(myData)
+        char nome[] = parser.getValue(document, "nome").value
+        char sexo[] = parser.getValue(document, "sexo").value
+        char idade[] = parser.getValue(document, "idade").value
+
+        dec idade2 = du.decFromString(idade)
+        bool flag = false
+
+        if ( su.iequal(sexo,"feminino") == 1 ){
+            if ( idade2 >= 21 ) { flag = true }
+        }
+        if ( su.iequal(sexo,"masculino") == 1 ){
+            if (idade2 >= 18 ) { flag = true }
+        }
+        
+        if ( flag == true ){
+          result = "Atingiu maior idade"
+        }else{
+          result = "Nao atingiu maior idade"
+        }
+        s.send(result)
+
+        s.disconnect()
+    }
+
+
+int App:main(AppParam params[])
+          {
+          TCPServerSocket host = new TCPServerSocket()
+          host.bind(TCPServerSocket.ANY_ADDRESS, 2021)
+
+          out.println("Waiting for clients...")
+
+          while (true)
+                {
+                TCPSocket client = new TCPSocket()
+
+                if (client.accept(host))
+                    asynch::streamHandler(client)
+                }
+
+          return 0
+          }
+  }

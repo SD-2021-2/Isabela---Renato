@@ -1,0 +1,37 @@
+component provides App requires io.Output out, net.TCPSocket, io.Input in
+                                    , data.json.JSONEncoder encoder{
+
+	int App:main(AppParam params[])
+		{
+		TCPSocket client = new TCPSocket()
+
+    data Person{
+      char nome[]
+      char cargo[]
+      dec salario
+    }
+
+    Person d = new Person()
+
+
+		if (client.connect("127.0.0.1", 2020))
+		{
+
+      out.println("Nome: ")
+      d.nome = in.readln()
+      out.println("Cargo: ")
+      d.cargo = in.readln()
+      out.println("Salario: ")
+      d.salario = in.readln()
+
+      JSONEncoder document = encoder.jsonFromData(d)
+      client.send(document,"\n")
+      char myData[] = client.recv(64)
+      out.println("$myData")
+
+      client.disconnect()
+		}
+
+		return 0
+		}
+	}

@@ -1,0 +1,55 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du {
+    void streamHandler(TCPSocket s)
+          		{
+                out.println("Client Accepted")
+                char buf[] = null
+                char myData[] = null
+                char buf2[] = null
+                char myData2[] = null
+
+                while ((buf = s.recv(1)).arrayLength > 0) {
+                  myData = new char[](myData, buf)
+                  if (buf == "\n") {
+                      break
+                  }
+                }
+                TCPSocket client2 = new TCPSocket()
+                if (client2.connect("127.0.0.1", 2021)){
+                    client2.send(new char[](myData,"\n"))
+
+                    out.println("Connected to DBS")
+
+                    while ((buf2 = client2.recv(1)).arrayLength > 0) {
+                      myData2 = new char[](myData2, buf2)
+                      if (buf2 == "\n") {
+                          break
+                      }
+
+                    }
+                    out.println("Disconnected from DBS")
+                    client2.disconnect()
+                }
+                s.send(myData2)
+                s.disconnect()
+
+              }
+    int App:main(AppParam params[])
+          		{
+          		TCPServerSocket host = new TCPServerSocket()
+           		host.bind(TCPServerSocket.ANY_ADDRESS, 2020)
+
+          		out.println("Waiting for clients...")
+
+              while (true)
+                    {
+                    TCPSocket client = new TCPSocket()
+
+                    if (client.accept(host))
+                    		asynch::streamHandler(client)
+                    }
+
+              return 0
+              }
+    	}

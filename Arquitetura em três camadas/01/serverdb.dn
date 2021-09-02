@@ -1,0 +1,47 @@
+component provides App requires io.Output out, net.TCPServerSocket,
+                                net.TCPSocket, data.json.JSONParser parser,
+                                data.StringUtil su,data.DecUtil du, data.adt.List li {
+
+    void streamHandler(TCPSocket s){
+
+        out.println("Client Accepted")
+        char buf[] = null
+        char myData[] = null
+        char result[] = null
+        while ((buf = s.recv(1)).arrayLength > 0) {
+            myData = new char[](myData, buf)
+            if (buf == "\n") {break}
+        }
+
+        if ( su.iequal(myData,"isabela\n") == 1){
+            result = "Nome: Isabela // Cargo : Programadora // Salario : 40000"
+        }
+        if ( su.iequal(myData,"sergio\n") == 1){
+            result = "Nome: Sergio // Cargo : Operador // Salario : 0.20"
+        }
+
+
+        s.send(new char[](result,"\n"))
+        s.disconnect()
+
+    }
+
+
+int App:main(AppParam params[])
+          {
+          TCPServerSocket host = new TCPServerSocket()
+          host.bind(TCPServerSocket.ANY_ADDRESS, 2021)
+
+          out.println("Waiting for clients...")
+
+          while (true)
+                {
+                TCPSocket client = new TCPSocket()
+
+                if (client.accept(host))
+                    asynch::streamHandler(client)
+                }
+
+          return 0
+          }
+  }
