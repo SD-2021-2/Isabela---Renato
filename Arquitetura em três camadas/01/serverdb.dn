@@ -13,8 +13,8 @@ component provides App requires io.Output out, net.TCPServerSocket,
             if (buf == "\n") {break}
         }
 
-        if ( su.iequal(myData,"isabela\n") == 1){
-            result = "Nome: Isabela // Cargo : Programadora // Salario : 40000"
+        if ( su.iequal(myData,"renato\n") == 1){
+            result = "Nome: Renato // Cargo : Programador // Salario : 40000"
         }
         if ( su.iequal(myData,"sergio\n") == 1){
             result = "Nome: Sergio // Cargo : Operador // Salario : 0.20"
